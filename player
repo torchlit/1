@@ -1,0 +1,106 @@
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using UnityEngine;
+using UnityEngine.AI;
+using UnityEngine.UI;
+
+[RequireComponent(typeof(NavMeshAgent))]
+
+public class Motorhead1 : MonoBehaviour
+{
+
+    public Text enemyHealth;
+    private spiderBehavior spiBeh;
+    private Animator anim;
+    public bool fightState;
+    Vector3 goal = new Vector3(0, 0, -1000);
+    NavMeshAgent agent;
+    public float cooldown = 3;
+    Collider enemy;
+    GameObject spider_aim;
+    private spigen spG;
+    private start_scr scr;
+    
+   
+    void Start()
+
+    {
+        
+        fightState = false;
+        spG = GameObject.Find("MAIN_bd").GetComponent<spigen>();
+        scr = GameObject.Find("MAIN_bd").GetComponent<start_scr>();
+        anim = GetComponentInChildren<Animator>();        
+        agent = GetComponent<NavMeshAgent>();
+        agent.destination = goal;
+        
+
+    }
+
+    
+
+
+    private void OnTriggerEnter(Collider enemy)
+
+    {
+        
+        if (enemy.CompareTag("aim") || enemy.CompareTag("enemies"))
+        agent.isStopped=true;
+
+    
+        spiBeh = GameObject.Find("spider_aim").GetComponent<spiderBehavior>();
+        
+        fightState = true;
+        this.enemy = enemy;
+        
+        
+
+    }
+
+    
+
+    void Update()
+
+
+    {
+
+        if (fightState == true && enemy==null)
+            fightState = false;
+
+        cooldown -= Time.deltaTime;
+
+        if (fightState == false)
+            agent.isStopped = false;
+
+
+
+        if ((fightState == true) && (cooldown <= 0) && enemy.gameObject.tag=="aim")
+        {
+
+            
+            
+            cooldown = 3;
+            anim.Play("Base Layer.Attack1");
+            ref int ad = ref scr.ad;
+            ref int hp = ref spiBeh.hp;
+            enemyHealth.text = "enemie health is " + hp.ToString();
+            hp--;
+            hp -=ad;//damaging
+
+            
+
+            return;
+        }
+
+
+        
+
+        
+
+    }
+
+
+
+
+
+}
